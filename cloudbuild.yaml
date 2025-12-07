@@ -1,0 +1,35 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'europe-west2-docker.pkg.dev/credovo-prod/credovo-services/underwriting-service:$SHORT_SHA',
+        '.'
+      ]
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'push',
+        'europe-west2-docker.pkg.dev/credovo-prod/credovo-services/underwriting-service:$SHORT_SHA'
+      ]
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      [
+        'run',
+        'deploy',
+        'underwriting-service',
+        '--image=europe-west2-docker.pkg.dev/credovo-prod/credovo-services/underwriting-service:$SHORT_SHA',
+        '--region=europe-west2',
+        '--platform=managed',
+        '--no-allow-unauthenticated',
+        '--quiet'
+      ]
+
+images:
+  - 'europe-west2-docker.pkg.dev/credovo-prod/credovo-services/underwriting-service:$SHORT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
